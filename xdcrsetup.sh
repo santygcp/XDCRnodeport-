@@ -50,10 +50,10 @@ kubectl cp ddl.sql votertestfinal:/opt/voltdb/voter/ddl.sql/
 kubectl exec -it votertestfinal -- /bin/bash -c "cd /opt/voltdb/voter/ ; ./run.sh init xdcr1-voltdb-cluster-client.default.svc.cluster.local"
 kubectl exec -it votertestfinal -- /bin/bash -c "cd /opt/voltdb/voter/ ; ./run.sh client xdcr1-voltdb-cluster-client.default.svc.cluster.local"
 
-retVal=$?
-if [ $retVal -ne 0 ]; then
-    echo "all job's completed"
-fi
+#retVal=$?
+#if [ $retVal -ne 0 ]; then
+#    echo "all job's completed"
+#fi
 
 gcloud container clusters create  --machine-type "c2-standard-8" --image-type UBUNTU_CONTAINERD  --num-nodes 3    xdcr-2 --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b"
 
