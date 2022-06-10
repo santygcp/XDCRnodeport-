@@ -1,0 +1,22 @@
+apiVersion: v1 
+kind: Pod
+metadata:   
+  name: votertestfinal2
+  labels:     
+    app: testclient 
+  
+spec:       
+  containers:       
+    - name: client        
+      image: gcr.io/santosh-350416/voltdb-source:volt-client
+      command: ["/bin/sh", "-ec", "sleep 3000000"]    
+      
+  
+      resources:
+          requests:
+             memory: "2Gi"
+             cpu: ".25"
+          limits:
+             memory: "2Gi"
+             cpu: ".25"
+
