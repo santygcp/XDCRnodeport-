@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<license>
+    <permit version="1" scheme="0">
+        <type>Enterprise Edition</type>
+        <issuer>
+            <company>VoltDB</company>
+            <email>support@voltdb.com</email>
+            <url>http://voltdb.com/</url>
+        </issuer>
+        <issuedate>2022-04-21</issuedate>
+        <licensee>SANTOSH_KUMAR</licensee>
+        <expiration>2023-04-21</expiration>
+        <hostcount max="101"/>
+        <features trial="true">
+            <wanreplication>true</wanreplication>
+            <dractiveactive>true</dractiveactive>
+        </features>
+        <note>FOR INTERNAL USE ONLY</note>
+    </permit>
+    <signature>
+        302D0215008C943DDBE3D6CB5861259012CDA288CE5AAB
+        A5F002141324C9F4D4F555FD683F1ED8B3165A6A1963D5E5
+    </signature>
+</license>
