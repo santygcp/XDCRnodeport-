@@ -42,7 +42,7 @@ kubectl create -f votertest.yaml
 sleep 180
 
 kubectl cp run.sh votertestfinal:/opt/voltdb/voter/run.sh/
-kubectl cp ddl.sh votertestfinal:/opt/voltdb/voter/ddl.sh/
+kubectl cp ddl.sql votertestfinal:/opt/voltdb/voter/ddl.sql/
 #kubectl exec -it votertestfinal -- /bin/bash -c "cd /opt/voltdb/voter/ ; ./run.sh init"
 #kubectl exec -it votertestfinal -- /bin/bash -c "cd /opt/voltdb/voter/ ; ./run.sh client"
 
@@ -67,12 +67,29 @@ sleep 360
 
 kubectl create -f votertest2.yaml
 
+sleep 180
+
 kubectl cp run.sh votertestfinal2:/opt/voltdb/voter/run.sh/
 
-kubectl cp ddl.sh votertestfinal2:/opt/voltdb/voter/ddl.sh/
+kubectl cp ddl.sql votertestfinal2:/opt/voltdb/voter/ddl.sql/
 
 kubectl exec -it votertestfinal2 -- /bin/bash -c "cd /opt/voltdb/voter/ ; ./run.sh init xdcr2-voltdb-cluster-client.default.svc.cluster.local"
 
+A=`kubectl get nodes -o wide | tail -1 | awk -F " " {'print $7'}`
+B=`kubectl get svc | grep -- -dr | tail -1 | awk -F " " {'print $5'} | cut -c 6-10`
+VAR2=$A:$B
+helm --kube-context=gke_fourth-epigram-293718_europe-west1-b_xdcr-1 upgrade xdcr1 santy/voltdb --reuse-values --version=1.3.5 --set cluster.config.deployment.dr.connection.source="$VAR2"
+
+kubectl config use-context gke_fourth-epigram-293718_europe-west1-b_xdcr-1
+
+A=`kubectl get nodes -o wide | tail -1 | awk -F " " {'print $7'}`
+B=`kubectl get svc | grep -- -dr | tail -1 | awk -F " " {'print $5'} | cut -c 6-10`
+VAR1=$A:$B
+
+helm --kube-context=gke_fourth-epigram-293718_europe-west1-b_xdcr-2 upgrade xdcr2 santy/voltdb --reuse-values --version=1.3.5 --set cluster.config.deployment.dr.connection.source="$VAR1"
+
+echo " check the connectivity using the below UI"
+kubectl get nodes -o wide | tail -1 | awk -F " " {'print $7'}
 
 
 
