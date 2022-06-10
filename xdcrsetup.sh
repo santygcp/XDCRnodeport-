@@ -10,7 +10,7 @@ helm repo add santy https://voltdb-kubernetes-charts.storage.googleapis.com
 
 #creating a cluster
 
-gcloud container clusters create  --machine-type "c2-standard-8" --image-type UBUNTU_CONTAINERD  --num-nodes 3    xdcr-1 --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b"
+gcloud container clusters create  --machine-type "c2-standard-8" --image-type UBUNTU_CONTAINERD  --num-nodes 3    xdcr-1 --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b" --service-account=Jenkins-test-santy
 
 
 #connecting to the cluster
@@ -55,7 +55,7 @@ if [ $retVal -ne 0 ]; then
     echo "all job's completed"
 fi
 
-gcloud container clusters create  --machine-type "c2-standard-8" --image-type UBUNTU_CONTAINERD  --num-nodes 3    xdcr-2 --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b"
+gcloud container clusters create  --machine-type "c2-standard-8" --image-type UBUNTU_CONTAINERD  --num-nodes 3    xdcr-2 --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b" --service-account=Jenkins-test-santy
 
 kubectl config use-context gke_fourth-epigram-293718_europe-west1-b_xdcr-2
 
