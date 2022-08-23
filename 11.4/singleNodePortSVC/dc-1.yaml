@@ -1,0 +1,25 @@
+global:
+  createNetworkPolicy: false
+
+cluster:
+  clusterSpec:
+    deletePVC: true
+
+  serviceSpec:
+    type: NodePort    # for VMC access
+    dr:
+      enabled: true
+      type: NodePort
+      replicationNodePort: 32765
+      externalTrafficPolicy: Local
+
+      annotations:
+        cluster1-key1: "cluster1-dr"
+
+  config:
+    deployment:
+      dr:
+        role: xdcr
+        id: 1
+        connection:
+          enabled: true
