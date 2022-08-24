@@ -1,0 +1,55 @@
+cluster:
+  config:
+    log4jcfgFile: |
+      <?xml version="1.0" encoding="UTF-8" ?>
+      <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+      <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+        <!-- Logging configuration for VoltDB running under Kubernetes.
+             This uses a single root logger. It is intended for the VoltDB
+             database process only, not for VoltDB utility programs. -->
+          <!-- info and lower goes to stdout -->
+          <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+              <param name="Threshold" value="TRACE"/>
+              <param name="Target" value="System.out"/>
+              <layout class="org.apache.log4j.PatternLayout">
+                  <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n"/>
+              </layout>
+              <filter class="org.apache.log4j.varia.LevelRangeFilter">
+                  <param name="LevelMin" value="TRACE" />
+                  <param name="LevelMax" value="INFO" />
+              </filter>
+          </appender>
+          <!-- warn and higher goes to stderr -->
+          <appender name="stderr" class="org.apache.log4j.ConsoleAppender">
+              <param name="Threshold" value="WARN"/>
+              <param name="Target" value="System.err"/>
+              <layout class="org.apache.log4j.PatternLayout">
+                  <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n"/>
+              </layout>
+          </appender>
+          <!-- and the log file will accept anything (rolling over at midnight) -->
+          <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+              <param name="File" value="log/volt.log"/>
+              <param name="DatePattern" value="'.'yyyy-MM-dd" />
+              <layout class="org.apache.log4j.PatternLayout">
+                  <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n"/>
+              </layout>
+          </appender>
+          <logger name="DRAGENT">
+              <level value="DEBUG"/>
+          </logger>
+          <logger name="DR">
+              <level value="DEBUG"/>
+          </logger>
+          <!-- logger name="CONSOLE">
+              <level value="INFO"/>
+              <appender-ref ref="stdout"/>
+              <appender-ref ref="stderr"/>
+          </logger -->
+          <root>
+              <priority value="INFO" />
+              <appender-ref ref="stdout" />
+              <appender-ref ref="stderr" />
+              <appender-ref ref="file" />
+          </root>
+      </log4j:configuration>

@@ -1,0 +1,101 @@
+kubectl create secret docker-registry dockerio-registry --docker-username=jadejakajal13 --docker-password=b461d1b4-82c4-499e-afc0-f17943a16411  --docker-email=jadejakajal13@gmail.com
+
+
+
+gcloud container clusters create  --machine-type c2-standard-8 \
+  --image-type UBUNTU_CONTAINERD  --num-nodes 3    cluster-1 \
+  --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-b"
+
+gcloud container clusters create  --machine-type c2-standard-8  \
+  --image-type UBUNTU_CONTAINERD  --num-nodes 3 cluster-2 \
+  --disk-type "pd-ssd" --disk-size "300" --zone "europe-west1-c"
+
+kubectl config get-contexts
+
+kubectl config use-context gke_fourth-epigram-293718_europe-west1-c_cluster-2
+
+kubectl config use-context gke_fourth-epigram-293718_europe-west1-b_demo-lab
+
+helm --kube-context gke_fourth-epigram-293718_europe-west1-b_demo-lab install c1 voltdb/voltdb --wait \
+  --values=dc-1.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+helm --kube-context gke_fourth-epigram-293718_europe-west1-c_cluster-2 install c2 voltdb/voltdb --wait \
+  --values=dc-2.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+bash-5.1$ ./kdrpublic -c gke_fourth-epigram-293718_europe-west1-c_cluster-2
+35.241.234.98:31310
+146.148.115.196:31311
+35.189.233.28:31312
+
+bash-5.1$ ./kdrpublic -c gke_fourth-epigram-293718_europe-west1-b_demo-lab
+35.205.7.164:31310
+104.199.103.1:31311
+34.79.181.244:31312
+
+
+2022-08-20 16:20:22,769 INFO     voltboot  *** VoltDB state is now 'starting' ***
+2022-08-20 16:20:22,769 INFO     voltboot  This is c1-voltdb-cluster-1
+2022-08-20 16:20:22,791 INFO     voltboot  Waiting for mesh to form
+2022-08-20 16:20:23,812 INFO     voltboot  Executing VoltDB start command: ['voltdb', 'start', '-c', '3', '--drpublic', '104.199.103.1:31311', '--topicspublic', 'c1-voltdb-cluster-1.c1-voltdb-cluster-internal.default.svc.cluster.local:9092', '--status', '11780', '--host', 'c1-voltdb-cluster-0.c1-voltdb-cluster-internal.default.svc.cluster.local,c1-voltdb-cluster-1.c1-voltdb-cluster-internal.default.svc.cluster.local,c1-voltdb-cluster-2.c1-voltdb-cluster-internal.default.svc.cluster.local']
+
+
+helm --kube-context=gke_fourth-epigram-293718_europe-west1-b_demo-lab upgrade c1 voltdb/voltdb --wait --reuse-values \
+  --set cluster.config.deployment.dr.connection.source="35.241.234.98:31310\,146.148.115.196:31311\,35.189.233.28:31312"
+
+helm --kube-context=gke_fourth-epigram-293718_europe-west1-c_cluster-2 upgrade c2 voltdb/voltdb --wait --reuse-values \
+  --set cluster.config.deployment.dr.connection.source="35.205.7.164:31310\,104.199.103.1:31311\,34.79.181.244:31312"
+
+
+
+
+# single Service NodePort DR
+
+helm --kube-context xd2 install c2 voltdb/voltdb --wait \
+  --values=dc-2.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+helm --kube-context xd1 install c1 voltdb/voltdb --wait \
+  --values=dc-1.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+ kubectl config rename-context  gke_fourth-epigram-293718_europe-west1-b_cluster-1 xd1
+
+
+ helm --kube-context=xd1 upgrade c1 voltdb/voltdb --wait --reuse-values \
+ --set cluster.config.deployment.dr.connection.source="10.132.15.196:32765\,10.132.15.195:32765\,10.132.15.198:32765"
+
+ helm --kube-context=xd2 upgrade c2 voltdb/voltdb --wait --reuse-values \
+  --set cluster.config.deployment.dr.connection.source="10.132.15.192:32765\,10.132.15.194:32765\,10.132.15.199:32765"
+
+helm --kube-context xd1 uninstall c1
+helm --kube-context xd2 uninstall 
+
+
+
+
+# pre- 1.6.0
+
+helm --kube-context xd1 install c1 voltdb/voltdb --wait \
+  --values=per-pod-dc1.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+helm --kube-context xd2 install c2 voltdb/voltdb --wait \
+  --values=per-pod-dc2.yaml \
+  --set-file cluster.config.schemas.cluster=../data/simple-partitioned.sql \
+  --values ../data/voltdb--dr-debug.yaml \
+  --set-file cluster.config.licenseXMLFile=/Users/thanos/Documents/license.xml
+
+
+

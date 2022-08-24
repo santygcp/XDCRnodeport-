@@ -1,0 +1,28 @@
+global:
+  createNetworkPolicy: false
+
+cluster:
+  clusterSpec:
+    deletePVC: true
+
+  serviceSpec:
+    dr:
+      # prevent the dr discovery service from being created, it's not needed
+      enabled: false
+      annotations:
+        cluster2-key1: "dc-zone2"
+
+    perpod:
+      type: NodePort
+      dr:
+        enabled: true
+        externalTrafficPolicy: Local
+        startReplicationNodePort: 31310
+
+  config:
+    deployment:
+      dr:
+        role: xdcr
+        id: 2
+        connection:
+          enabled: true

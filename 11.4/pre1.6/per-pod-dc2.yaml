@@ -1,0 +1,46 @@
+global:
+  createNetworkPolicy: false
+
+cluster:
+  clusterSpec:
+    deletePVC: true
+
+  serviceSpec:
+    dr:
+      type: NodePort   # VMC 
+      type: NodePort
+      servicePerPod: true
+
+      annotations:
+        cluster1-key1: "cluster-2"
+
+      override:
+      - podIndex: 0
+        spec:
+          type: NodePort
+          ports:
+          - name: replication
+            nodePort: 32760
+            port: 5555
+      - podIndex: 1
+        spec:
+          type: NodePort
+          ports:
+          - name: replication
+            nodePort: 32761
+            port: 5555
+      - podIndex: 2
+        spec:
+          type: NodePort
+          ports:
+          - name: replication
+            nodePort: 32762
+            port: 5555
+
+  config:
+    deployment:
+      dr:
+        role: xdcr
+        id: 2
+        connection:
+          enabled: true
